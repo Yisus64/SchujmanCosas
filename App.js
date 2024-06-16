@@ -15,7 +15,12 @@ class Persona {
     this.email = email;
     this.telefono = telefono;
   }
-}
+
+    get nombreCompleto () {
+      return `${this.nombre} ${this.apellido}`;
+    }
+  }
+
 
 function getPagePersons(persons, page, searchTerm, searchType) {
   let filteredPersons = [];
@@ -29,22 +34,22 @@ function getPagePersons(persons, page, searchTerm, searchType) {
   switch (searchType) {
     case "normal":
       filteredPersons = persons.filter(person =>
-        person.nombre.toLowerCase() === searchTerm.toLowerCase()
+        person.nombreCompleto.toLowerCase() === searchTerm.toLowerCase()
       );
       break;
     case "startWith":
       filteredPersons = persons.filter(person =>
-        person.nombre.toLowerCase().startsWith(searchTerm.toLowerCase())
+        person.nombreCompleto.toLowerCase().startsWith(searchTerm.toLowerCase())
       );
       break;
     case "endWith":
       filteredPersons = persons.filter(person =>
-        person.nombre.toLowerCase().endsWith(searchTerm.toLowerCase())
+        person.nombreCompleto.toLowerCase().endsWith(searchTerm.toLowerCase())
       );
       break;
     case "contains":
       filteredPersons = persons.filter(person =>
-        person.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+        person.nombreCompleto.toLowerCase().includes(searchTerm.toLowerCase())
       );
       break;
     default:
@@ -72,6 +77,10 @@ function goToNextPage(page, persons, setPage) {
   }
 }
 
+function showInfo(person, setSelectePerson, setShowInfoBox){
+  setSelectePerson(person);
+  setShowInfoBox(true);
+}
 function handleAddBox(persons, newPerson, setPersons, setNewName, setNewSurname, setNewMail, setNewPhone, page, setPage, setShowAddBox) {
   if (persons.length / page === 7) {
     setPage(page + 1);
@@ -95,6 +104,8 @@ function App() {
   const [newMail, setNewMail] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [showAddBox, setShowAddBox] = useState(false);
+  const [showInfoBox, setShowInfoBox] = useState(false);
+  const [selectedPerson, setSelectePerson] = useState(null);
   const [page, setPage] = useState(initialPage);
 
   const newPerson = new Persona(newName, newSurname, newMail, newPhone);
@@ -131,6 +142,15 @@ function App() {
           <button className="add-button" onClick={() => handleAddBox(persons, newPerson, setPersons, setNewName, setNewSurname, setNewMail, setNewPhone, page, setPage, setShowAddBox)}>+</button>
         </div>
       )}
+      {showInfoBox && selectedPerson && (
+        <div className="info-box">
+          <button className="close-button" onClick={() => setShowInfoBox(false)}>X</button>
+          <p>Nombre: {selectedPerson.nombre}</p>
+          <p>Apellido: {selectedPerson.apellido}</p>
+          <p>Email: {selectedPerson.email}</p>
+          <p>Numero: {selectedPerson.telefono}</p>
+        </div>
+      )}
       <div className='search-box'>
         <div className="search-bar">
           <input
@@ -164,7 +184,7 @@ function App() {
       </div>
       <div className="lista">
         {getPagePersons(persons, page, searchTerm, searchType).map((person, index) => (
-          <button className="cajita" key={index}>{person.nombre} {person.apellido} {person.email} {person.telefono}</button>
+          <button className="cajita" onClick = {() => showInfo(person, setSelectePerson, setShowInfoBox)} key={index}>{person.nombreCompleto}</button>
         ))}
       </div>
     </div>
